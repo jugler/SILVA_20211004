@@ -1,0 +1,15 @@
+<!--uploadSuccess.html-->
+
+{{ template "header.html" .}}
+
+    <h1>Upload Success!</h1> 
+ 
+    
+    <div class="img__wrap">
+        <a href="/videos/{{.VideoPath}}"><h2>{{.VideoTitle}}</h2>
+        <img src="/videos/{{.VideoID}}.png" width="256" height="256" title="{{.VideoTitle}}"></img></a>
+        <p>Category: {{.VideoCategory}}</p>
+    </div>
+
+
+{{ template "footer.html" .}}

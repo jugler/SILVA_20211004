@@ -1,0 +1,30 @@
+<!--index.html-->
+
+{{ template "header.html" .}}
+<form action="upload/" method="post" enctype="multipart/form-data" >
+    <h1>Upload Video</h1> 
+
+    <p>
+        Title of the Video:<input type="text" name="videoTitle"></input>
+    </p>
+    <p>
+        Video File:<input type="file" name="file" accept=".mp4,.mov"></input>
+    </p>
+
+    <p>
+        Categories: 
+        <select name="category" id="category">
+        {{range .categories }}
+            <option value="{{.Category}}">{{.Category}}</option>
+        {{end}}
+        </select>
+    </p>
+
+    <p>
+        <button type="submit" name="UploadVideo" value="Upload Video">Upload Video</button>
+
+    </p>
+</form>
+
+
+{{ template "footer.html" .}}
