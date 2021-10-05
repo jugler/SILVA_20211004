@@ -52,11 +52,11 @@ func insertThumbnail(db *sql.DB, video Video) {
 
 func insertInitRecordsCategory(db *sql.DB) {
 	//check if init data is already there
-	sqlStatement := "SELECT category_id FROM category"
+	selectCategoryStatement := "SELECT category_id FROM category"
 
-	row := db.QueryRow(sqlStatement)
-	var categoryCount int
-	switch err := row.Scan(&categoryCount); err {
+	row := db.QueryRow(selectCategoryStatement)
+	var category_id int
+	switch err := row.Scan(&category_id); err {
 	case sql.ErrNoRows:
 		log.Print("No categories found, init category table with default data")
 		insertCategory(db, "Exercise")

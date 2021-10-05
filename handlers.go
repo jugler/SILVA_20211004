@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const MAX_UPLOAD_SIZE = 200 * 1024 * 1024 //200MB -> byte
+const MAX_UPLOAD_SIZE = 200 * 1024 * 1024 //MB -> byte (200mb file limit)
 
 func showVideosPage(c *gin.Context) {
 	videos := getAllVideosDB(dbConn)
