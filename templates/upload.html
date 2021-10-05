@@ -1,7 +1,7 @@
 <!--index.html-->
 
 {{ template "header.html" .}}
-<form action="upload/" method="post" enctype="multipart/form-data" >
+<form method="post" enctype="multipart/form-data" action="upload">
     <h1>Upload Video</h1> 
 
     <p>
@@ -15,7 +15,7 @@
         Categories: 
         <select name="category" id="category">
         {{range .categories }}
-            <option value="{{.Category}}">{{.Category}}</option>
+            <option value="{{.ID}}">{{.Name}}</option>
         {{end}}
         </select>
     </p>

@@ -7,10 +7,15 @@
     {{range .videos }}
     <div class="img__wrap">
       <a href="/videos/{{.Path}}"><h2>{{.Title}}</h2>
-      <img src="/videos/{{.ID}}.png" width="256" height="256" title="{{.Title}}"></img></a>
-      <p>Category: {{.Category}}</p>
+      <img id={{.ID}} src="data:image/png;base64,{{.Thumbnail.LargeEncoded}}" width="256" height="256" title="{{.Title}}"></img></a>
+      <p><b>Category: {{.Category.Name}}</b></p>
     </div>
   {{end}}
 
 {{ template "footer.html" .}}
+
+<script>
+  document.getElementById("ItemPreview").src = "data:image/png;base64," + yourByteArrayAsBase64;
+
+</script>
 

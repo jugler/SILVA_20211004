@@ -1,24 +1,23 @@
 package main
 
 import (
-	"fmt"
-	"io"
+	b64 "encoding/base64"
 	"log"
 	"net/http"
-	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	_ "github.com/lib/pq"
 )
 
+const MAX_UPLOAD_SIZE = 200 * 1024 * 1024 //200MB -> byte
+
 func showVideosPage(c *gin.Context) {
-	videos := getAllVideos()
-	// Call the HTML method of the Context to render a template
+	videos := getAllVideosDB(dbConn)
 	c.HTML(
-		// Set the HTTP status to 200 (OK)
 		http.StatusOK,
-		// Use the index.html template
 		"index.html",
-		// Pass the data that the page uses
 		gin.H{
 			"title":  "Home Page",
 			"videos": videos,
@@ -27,13 +26,10 @@ func showVideosPage(c *gin.Context) {
 }
 
 func showUploadPage(c *gin.Context) {
-	categories := getAllCategories()
+	categories := getAllCategoriesDB(dbConn)
 	c.HTML(
-		// Set the HTTP status to 200 (OK)
 		http.StatusOK,
-		// Use the index.html template
 		"upload.html",
-		// Pass the data that the page uses
 		gin.H{
 			"title":      "Upload Video Page",
 			"categories": categories,
@@ -42,50 +38,58 @@ func showUploadPage(c *gin.Context) {
 }
 
 func upload(c *gin.Context) {
-	file, header, err := c.Request.FormFile("file")
+	file, err := c.FormFile("file")
 	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("file err : %s", err.Error()))
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	filename := header.Filename
-	out, err := os.Create("videos/" + filename)
+
+	if c.Request.ContentLength > MAX_UPLOAD_SIZE {
+		//received file is larger than our Max upload size, return an error message
+		c.HTML(
+			http.StatusOK,
+			"uploadSuccess.html",
+			gin.H{
+				"title": "Upload Video Failure",
+				"error": "File exceeded max upload size of 200mb",
+			},
+		)
+		return
+	}
+
+	newFileName := "videos/" + file.Filename
+	//TODO: Add check to see if filename already exist, do not replace file
+	//Use DB generated sequence as filename to avoid clash of filenames
+	if err := c.SaveUploadedFile(file, newFileName); err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	intVar, err := strconv.Atoi(c.Request.FormValue("category"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer out.Close()
-	_, err = io.Copy(out, file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	video := video{ID: 3, Path: filename, Title: c.Request.FormValue("videoTitle"), Category: c.Request.FormValue(("category"))}
+	category := Category{ID: intVar}
+	video := Video{Path: newFileName, Title: c.Request.FormValue("videoTitle"), Category: category}
+
+	video.ID = saveVideoDB(dbConn, video)
+
+	video.Thumbnail.Small = generateThumbnails(newFileName, 64)
+	video.Thumbnail.SmallEncoded = b64.StdEncoding.EncodeToString([]byte(video.Thumbnail.Small))
+	video.Thumbnail.Medium = generateThumbnails(newFileName, 128)
+	video.Thumbnail.MediumEncoded = b64.StdEncoding.EncodeToString([]byte(video.Thumbnail.Medium))
+	video.Thumbnail.Large = generateThumbnails(newFileName, 256)
+	video.Thumbnail.LargeEncoded = b64.StdEncoding.EncodeToString([]byte(video.Thumbnail.Large))
+
+	insertThumbnail(dbConn, video)
 
 	c.HTML(
 		http.StatusOK,
 		"uploadSuccess.html",
 		gin.H{
-			"title":         "Upload Video Success",
-			"VideoPath":     video.Path,
-			"VideoTitle":    video.Title,
-			"VideoID":       video.ID,
-			"VideoCategory": video.Category,
+			"title": "Upload Video Success",
+			"video": video,
 		},
 	)
 
-}
-
-func getAllCategories() []category {
-	var categoryList = []category{
-		{Category: "Exercise"},
-		{Category: "Education"},
-		{Category: "Recipe"},
-	}
-	return categoryList
-}
-
-func getAllVideos() []video {
-	var videoList = []video{
-		{ID: 1, Path: "1.mp4", Title: "Video 1", Category: "Video 1 category"},
-		{ID: 2, Path: "2.mp4", Title: "Video 2", Category: "Video 2 category"},
-	}
-	return videoList
 }

@@ -2,14 +2,16 @@
 
 {{ template "header.html" .}}
 
-    <h1>Upload Success!</h1> 
+    <h1>{{.title}}</h1> 
+    <h2>{{.error}}</h2>
  
-    
+    {{ if not .error }}
     <div class="img__wrap">
-        <a href="/videos/{{.VideoPath}}"><h2>{{.VideoTitle}}</h2>
-        <img src="/videos/{{.VideoID}}.png" width="256" height="256" title="{{.VideoTitle}}"></img></a>
-        <p>Category: {{.VideoCategory}}</p>
+        <a href="/videos/{{.video.Path}}"><h2>{{.video.Title}}</h2>
+        <img src="data:image/png;base64,{{.video.Thumbnail.LargeEncoded}}" width="256" height="256" title="{{.video.Title}}"></img></a>
+        
     </div>
+    {{end}}
 
 
 {{ template "footer.html" .}}
