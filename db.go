@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	host                    = "localhost"
+	host                    = "db"
 	port                    = 5432
-	user                    = "newuser"
+	user                    = "postgres"
 	password                = "password"
-	dbname                  = "youtubez_data"
+	dbname                  = "postgres"
 	create_videos_table     = "CREATE TABLE videos (video_id SERIAL PRIMARY KEY, title VARCHAR NOT NULL, path VARCHAR NOT NULL, category_id INTEGER, CONSTRAINT fk_category FOREIGN KEY(category_id) REFERENCES category(category_id))"
 	create_categories_table = "CREATE TABLE category (category_id SERIAL, category varchar(255), PRIMARY KEY(category_id))"
 	create_thumbnail_table  = "CREATE TABLE thumbnails (thumbnail_id SERIAL PRIMARY KEY, image_small BYTEA NOT NULL, image_med BYTEA NOT NULL, image_large BYTEA NOT NULL, video_id INTEGER, CONSTRAINT fk_videos FOREIGN KEY(video_id) REFERENCES videos(video_id))"

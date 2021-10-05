@@ -7,7 +7,7 @@
  
     {{ if not .error }}
     <div class="img__wrap">
-        <a href="/videos/{{.video.Path}}"><h2>{{.video.Title}}</h2>
+        <a href="/{{.video.Path}}"><h2>{{.video.Title}}</h2>
         <img src="data:image/png;base64,{{.video.Thumbnail.LargeEncoded}}" width="256" height="256" title="{{.video.Title}}"></img></a>
         
     </div>
