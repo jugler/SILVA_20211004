@@ -1,6 +1,3 @@
-# Jesus Silva
-
-
 ## Build and Run
 
 ```docker-compose up```
